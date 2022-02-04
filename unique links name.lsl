@@ -1,3 +1,4 @@
+// Give each link a unique name
 
 list gl_names = [];
 
@@ -5,14 +6,14 @@ default
 {
     state_entry()
     {
-        integer link = !!llGetLinkNumber(); 
-		integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)OBJECT_PRIM_COUNT), 0) + link;
+        integer link = !!llGetLinkNumber();
+        integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)OBJECT_PRIM_COUNT), 0) + link;
 
         for (;link < links; ++link)
         {
             string name = llList2String(llGetLinkPrimitiveParams(link, (list)PRIM_NAME), 0);
             string new_name = name;
-            
+
             if (~llListFindList(gl_names, (list)name))
             {
                 integer numb = 1;
