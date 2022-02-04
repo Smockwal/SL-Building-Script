@@ -1,7 +1,7 @@
 
 string short_float(float value)
 {
-    string snumb = (string)((integer)(numb * 1000.0) / 1000.0);
+    string snumb = (string)((integer)(value * 1000.0) / 1000.0);
     while(llGetSubString(snumb, -1, -1) == "0") snumb = llDeleteSubString(snumb, -1, -1);
     if(llGetSubString(snumb, -1, -1) == ".") snumb = (string)((integer)snumb);
     return snumb;
@@ -38,7 +38,7 @@ default
                 out += ", Invalide UV data";
 
             list data = llGetLinkPrimitiveParams(link, [PRIM_COLOR, side, PRIM_TEXTURE, side]);
-            out +=  "\nColor: " + short_vector(llList2Float(data, 0)) + 
+            out +=  "\nColor: " + short_vector(llList2Vector(data, 0)) + 
                     ", Alpha: " + short_float(llList2Float(data, 1));
             
             float rot = llList2Float(data, 5);
