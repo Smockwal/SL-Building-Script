@@ -23,13 +23,10 @@ default
         for(; link < links; ++link)
             total_sides += llGetLinkNumberOfSides(link);
 
-
         integer root = llCeil(llPow(total_sides, 0.33333333333333333333333333333333));
         float div = 1.0 / (float)root;
 
         list colors;
-        integer color_numb;
-
         integer index;
         for(side = 0; side < total_sides; ++side) 
             colors += index_to_3d(++index, root) * div;

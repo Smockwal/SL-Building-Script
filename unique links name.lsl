@@ -11,7 +11,8 @@ default
 
         for (;link < links; ++link)
         {
-            string name = llList2String(llGetLinkPrimitiveParams(link, (list)PRIM_NAME), 0);
+            
+            string name = llGetLinkName(link);
             string new_name = name;
 
             if (~llListFindList(gl_names, (list)name))
