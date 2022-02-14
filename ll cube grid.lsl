@@ -25,6 +25,8 @@ set()
         PRIM_TEXTURE, 4, DIFFUSE, <tsc.y, tsc.z, 0>, ZERO_VECTOR, 0,
         PRIM_TEXTURE, 5, DIFFUSE, <tsc.x, tsc.y, 0>, ZERO_VECTOR, 0
     ]);
+    
+    llTargetRemove(gi_target_id);
     gi_target_id = llTarget(pos, 0);
 }
 
