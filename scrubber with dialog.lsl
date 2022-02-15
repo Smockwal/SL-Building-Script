@@ -281,7 +281,7 @@ default
         if (message == BUTTON_DAMAGE || do_all)
             llSetDamage(0);
 
-        if (message == BUTTON_DAMAGE || do_all)
+        if (message == BUTTON_RLV || do_all)
             llOwnerSay("@Clear");
             
         if (params) 
