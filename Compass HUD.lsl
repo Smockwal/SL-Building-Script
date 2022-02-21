@@ -26,11 +26,11 @@ default
             integer perm = PERMISSION_ATTACH;
             if (att == ATTACH_HUD_BOTTOM)
             {
-                vector pos = llGetLocalPos();
-                if (pos.z <= 0.05) pos.z = 0.05;
+                float zpos = llGetLocalPos() * <0, 0, 1>;
+                if (zpos <= 0.05) zpos = 0.05;
 
                 llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                    PRIM_POS_LOCAL, pos,  
+                    PRIM_POS_LOCAL, <0, 0, zpos>,  
                     PRIM_ROTATION, ZERO_ROTATION,
                     PRIM_SIZE, <0.5, 0.4, 0.05>
                 ]);
