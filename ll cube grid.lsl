@@ -9,7 +9,7 @@ integer gi_target_id;
 set() 
 {
     vector scale = llGetScale();
-    vector tsc = scale * 0.05;
+    vector tsc = scale * 0.1;
 
     vector pos = llGetRootPosition();
     pos = <llRound(pos.x), llRound(pos.y), llRound(pos.z) - (scale.z * 0.5)>;
