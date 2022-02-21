@@ -1,5 +1,6 @@
 
 #define DIFFUSE "950b4f00-a1f7-ddad-a8ae-3582c5f77134"
+#define COLOR <0.502, 0.502, 0.502>
 
 integer gi_root_link;
 string gs_root_id;
@@ -16,7 +17,7 @@ set()
     llSetLinkPrimitiveParamsFast(gi_root_link, [
         PRIM_POSITION, pos,
         PRIM_ROTATION, ZERO_ROTATION,
-        PRIM_COLOR, ALL_SIDES, <1, 1, 1>, 1,
+        PRIM_COLOR, ALL_SIDES, COLOR, 1,
         PRIM_FULLBRIGHT, ALL_SIDES, 1,
         PRIM_TEXTURE, 0, DIFFUSE, <tsc.x, tsc.y, 0>, ZERO_VECTOR, 0,
         PRIM_TEXTURE, 1, DIFFUSE, <tsc.x, tsc.z, 0>, ZERO_VECTOR, 0,
