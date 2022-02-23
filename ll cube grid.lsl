@@ -54,7 +54,7 @@ default
             ]);
             
             llTargetRemove(gi_target_id);
-            gi_target_id = llTarget(llGetPos(), 0.01);
+            gi_target_id = llTarget(llGetRootPosition(), 0.01);
         }
     }
 
