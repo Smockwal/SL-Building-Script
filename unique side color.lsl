@@ -13,14 +13,15 @@ default
 {
     state_entry() 
     {
-        integer link = !!llGetLinkNumber();
+        integer root_link = !!llGetLinkNumber();
+        integer link;
         integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)OBJECT_PRIM_COUNT), 0) + link;
 
         integer side;
         integer sides;
         integer total_sides;
         
-        for(; link < links; ++link)
+        for(link = root_link; link < links; ++link)
             total_sides += llGetLinkNumberOfSides(link);
 
         integer root = llCeil(llPow(total_sides, 0.33333333333333333333333333333333));
@@ -31,7 +32,7 @@ default
         for(side = 0; side < total_sides; ++side) 
             colors += index_to_3d(++index, root) * div;
 
-        for(link = 0; link < links; ++link) 
+        for(link = root_link; link < links; ++link) 
         {
             for(side = 0, sides = llGetLinkNumberOfSides(link); side < sides; ++side) 
             {

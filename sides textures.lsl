@@ -21,7 +21,7 @@ default
         integer side;
         integer sides;
 
-        for (link = 0; link < links; ++link) 
+        for (; link < links; ++link) 
             for (side = 0, sides = llGetLinkNumberOfSides(link); side < sides; ++side) 
                 llSetLinkPrimitiveParamsFast(link,
                     [ PRIM_TEXTURE, side, llList2String(gl_textures, side)] + 
