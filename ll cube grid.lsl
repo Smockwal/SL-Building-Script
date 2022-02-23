@@ -38,7 +38,7 @@ default
 
             float ground = llGround(ZERO_VECTOR); 
             while (pos.z < ground)
-                pos.z = llRound(pos.z + 1); 
+                pos.z += 1; 
 
             llSetLinkPrimitiveParams(gi_root_link, [
                 PRIM_POSITION, pos,
