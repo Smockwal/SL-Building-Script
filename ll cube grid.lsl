@@ -3,70 +3,63 @@
 #define COLOR <0.502, 0.502, 0.502>
 
 integer gi_root_link;
-string gs_root_id;
 integer gi_target_id;
-
-set() 
-{
-    vector scale = llGetScale();
-    vector tsc = scale * 0.1;
-
-    vector pos = llGetRootPosition();
-    pos = <llRound(pos.x), llRound(pos.y), llRound(pos.z) - (scale.z * 0.5)>;
-
-    llSetLinkPrimitiveParamsFast(gi_root_link, [
-        PRIM_POSITION, pos,
-        PRIM_ROTATION, ZERO_ROTATION,
-        PRIM_COLOR, ALL_SIDES, COLOR, 1,
-        PRIM_FULLBRIGHT, ALL_SIDES, 1,
-        PRIM_TEXTURE, 0, DIFFUSE, <tsc.x, tsc.y, 0>, ZERO_VECTOR, 0,
-        PRIM_TEXTURE, 1, DIFFUSE, <tsc.x, tsc.z, 0>, ZERO_VECTOR, 0,
-        PRIM_TEXTURE, 2, DIFFUSE, <tsc.y, tsc.z, 0>, ZERO_VECTOR, 0,
-        PRIM_TEXTURE, 3, DIFFUSE, <tsc.x, tsc.z, 0>, ZERO_VECTOR, 0,
-        PRIM_TEXTURE, 4, DIFFUSE, <tsc.y, tsc.z, 0>, ZERO_VECTOR, 0,
-        PRIM_TEXTURE, 5, DIFFUSE, <tsc.x, tsc.y, 0>, ZERO_VECTOR, 0
-    ]);
-    
-    llTargetRemove(gi_target_id);
-    gi_target_id = llTarget(pos, 0);
-}
 
 default 
 {
     state_entry()
     {
         gi_root_link = !!llGetLinkNumber();
-        gs_root_id = llGetLinkKey(gi_root_link);
-        set();
+        llSetTimerEvent(1);
     }
 
     not_at_target()
     {
-        llTargetRemove(gi_target_id);
-        llSetTimerEvent(1);
+        if (gi_target_id) 
+        {
+            llTargetRemove(gi_target_id);
+            gi_target_id = 0;
+            llSetTimerEvent(1);
+        }
     }
 
     timer()
     {
-        list data = llGetObjectDetails(gs_root_id, (list)OBJECT_SELECT_COUNT);
+        list data = llGetObjectDetails(llGetLinkKey(gi_root_link), (list)OBJECT_SELECT_COUNT);
         if (!llList2Integer(data, 0))
         {
             llSetTimerEvent(0);
-            set();
+
+            vector scale = llGetScale();
+            vector tsc = scale * 0.1;
+
+            vector pos = llGetRootPosition();
+            pos = <llRound(pos.x), llRound(pos.y), llRound(pos.z) - (scale.z * 0.5)>;
+
+            llSetLinkPrimitiveParams(gi_root_link, [
+                PRIM_POSITION, pos,
+                PRIM_ROTATION, ZERO_ROTATION,
+                PRIM_COLOR, ALL_SIDES, COLOR, 1,
+                PRIM_FULLBRIGHT, ALL_SIDES, 1,
+                PRIM_TEXTURE, 0, DIFFUSE, <tsc.x, tsc.y, 0>, ZERO_VECTOR, 0,
+                PRIM_TEXTURE, 1, DIFFUSE, <tsc.x, tsc.z, 0>, ZERO_VECTOR, 0,
+                PRIM_TEXTURE, 2, DIFFUSE, <tsc.y, tsc.z, 0>, ZERO_VECTOR, 0,
+                PRIM_TEXTURE, 3, DIFFUSE, <tsc.x, tsc.z, 0>, ZERO_VECTOR, 0,
+                PRIM_TEXTURE, 4, DIFFUSE, <tsc.y, tsc.z, 0>, ZERO_VECTOR, 0,
+                PRIM_TEXTURE, 5, DIFFUSE, <tsc.x, tsc.y, 0>, ZERO_VECTOR, 0
+            ]);
+            
+            llTargetRemove(gi_target_id);
+            gi_target_id = llTarget(llGetPos(), 0.01);
         }
     }
 
     changed( integer change )
     {
         if (change & CHANGED_SCALE)
-        {
-            set();
-        }
+            llSetTimerEvent(1);
 
         if (change & CHANGED_LINK)
-        {
             gi_root_link = !!llGetLinkNumber();
-            gs_root_id = llGetLinkKey(gi_root_link);
-        }
     }
 }
