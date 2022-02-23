@@ -14,7 +14,7 @@ default
     state_entry() 
     {
         integer root_link = !!llGetLinkNumber();
-        integer link;
+        integer link = root_link;
         integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)OBJECT_PRIM_COUNT), 0) + link;
 
         integer side;
