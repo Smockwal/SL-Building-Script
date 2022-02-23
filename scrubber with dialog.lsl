@@ -1,4 +1,5 @@
 #define BUTTON_ALL "ALL"
+#define BUTTON_DONE "DONE"
 
 #define MENU_TEXT "TEXT"
 #define MENU_FLAG "FLAG"
@@ -50,7 +51,7 @@
 list gl_buttons_main = [
     BUTTON_ALL, MENU_TEXT, MENU_FLAG, 
     MENU_SIT, MENU_VISUAL, MENU_SOUND, 
-    MENU_MISC
+    MENU_MISC, BUTTON_DONE
 ];
 
 list gl_buttons_text = [
@@ -166,6 +167,10 @@ default
         {
             do_all = TRUE;
         }
+        else if (message == BUTTON_DONE)
+        {
+            state done;
+        }
         else if (~llListFindList(gl_buttons_main, (list)message))
         {
             dialog(message);
@@ -184,7 +189,7 @@ default
         
         if (message == BUTTON_SIT || do_all)
             llSetSitText("");
-            
+
         if (message == BUTTON_NAME || do_all)
             params += [PRIM_LINK_TARGET, LINK_SET, PRIM_NAME, "Object"];
 
