@@ -11,6 +11,8 @@
 #define BUTTON_OVER "OVER TEXT"
 #define BUTTON_TOUCH "TOUCH TEXT"
 #define BUTTON_SIT "SIT TEXT"
+#define BUTTON_NAME "NAME"
+#define BUTTON_DESC "DESCRIPTION"
 
 // flag
 #define BUTTON_VEHICLE "VEHICLE"
@@ -52,7 +54,8 @@ list gl_buttons_main = [
 ];
 
 list gl_buttons_text = [
-    BUTTON_OVER, BUTTON_TOUCH, BUTTON_SIT
+    BUTTON_OVER, BUTTON_TOUCH, BUTTON_SIT,
+    BUTTON_NAME, BUTTON_DESC
 ];
 
 list gl_buttons_flag = [
@@ -181,6 +184,12 @@ default
         
         if (message == BUTTON_SIT || do_all)
             llSetSitText("");
+            
+        if (message == BUTTON_NAME || do_all)
+            params += [PRIM_LINK_TARGET, LINK_SET, PRIM_NAME, "Object"];
+
+        if (message == BUTTON_DESC || do_all)
+            params += [PRIM_LINK_TARGET, LINK_SET, PRIM_DESC, ""];
 
         // flag
         if (message == BUTTON_VEHICLE || do_all)
