@@ -57,7 +57,7 @@ string short_float(string value)
 {
     if ((float)value == 0.0) return "0";
     while(llGetSubString(value, -1, -1) == "0") value = llDeleteSubString(value, -1, -1);
-    return llDumpList2String(llParseStringKeepNulls(value, (list)"0.", []), ".");
+    return llDumpList2String(llParseStringKeepNulls(value, (list)"-0.", []), "-.");
 }
 
 string toMM(float value)
