@@ -54,18 +54,16 @@ default
         else if (message == "-5%")
             factor = 0.95;
         else if (message == "-10%")
-            factor = 0.8;
+            factor = 0.9;
 
-        if (factor)
+        if (factor < llGetMaxScaleFactor() && factor > llGetMinScaleFactor()) 
         {
-            if (factor < llGetMaxScaleFactor() && factor > llGetMinScaleFactor()) 
-            {
-                integer success = llScaleByFactor(factor);
-                if (success) gf_factor *= factor;
-            }
-        }
+            integer success = llScaleByFactor(factor);
+            if (success) 
+                gf_factor *= factor;
 
-        dialog(id, channel);
+            dialog(id, channel);
+        }
     }
 
     timer()
