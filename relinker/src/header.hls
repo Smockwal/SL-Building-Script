@@ -1,0 +1,14 @@
+#ifndef HEADER
+#define HEADER
+
+#define LINKABILITY_MAX_DIST 54
+#define LINKABILITY_MAX_LINK 256
+
+#define WORD_LOG #__UID__
+#define WORD_LINK #__UID__
+#define WORD_BREAK #__UID__
+
+#define TIMER_MIN_TIME 0.022444
+#define bool(x) !!(x)
+
+#endif // HEADER

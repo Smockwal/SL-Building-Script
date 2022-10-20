@@ -40,7 +40,10 @@ default
         if (message == "·Done·")
             state clean;
         else if (message == "·Close·")
+        {
             llListenControl(gi_hand, FALSE);
+            return;
+        }
         else if (message == "·Reset·")
             factor = 1.0 / gf_factor;
         else if (message == "+1%")
@@ -61,9 +64,9 @@ default
             integer success = llScaleByFactor(factor);
             if (success) 
                 gf_factor *= factor;
-
-            dialog(id, channel);
         }
+
+        dialog(id, channel);
     }
 
     timer()
