@@ -1,36 +1,26 @@
-
-
-string uid (integer index) 
-{
+ string uid(integer index) {
     string alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     integer a = index % 52;
-    integer b = llFloor((float)index / 52.0) % 52;
-    return  llGetSubString(alph, a, a) + llGetSubString(alph, b, b);
+    integer b = llFloor((float)index * 0.019230769230769232) % 52;
+    return llGetSubString(alph, a, a) + llGetSubString(alph, b, b);
 }
-
-default
-{
-    state_entry()
-    {
+default  {
+    state_entry() {
         integer link = !!llGetLinkNumber();
-        integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)OBJECT_PRIM_COUNT), 0) + link;
-
-        list names = [""];
+        integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)30), 0) + link;
+        list names = (list)"";
         integer index;
-        for (++link; link < links; ++link)
-        {
+        for (++link; link<links; ++link) {
             string name = llGetLinkName(link);
-            if (llStringLength(name) > 2 || ~llListFindList(names, (list)name))
-            {
-                name = uid(index);
-                while (~llListFindList(names, (list)name))
+            if (llStringLength(name) > 2 | ~llListFindList(names, (list)name)) {
+                do  {
                     name = uid(++index);
-                
-                llSetLinkPrimitiveParamsFast(link, [PRIM_NAME, name]);
+                }
+                while (~llListFindList(names, (list)name));
+                llSetLinkPrimitiveParamsFast(link, [27, name]);
             }
             names += name;
         }
-
         llWhisper(0, "Done");
         llRemoveInventory(llGetScriptName());
     }
