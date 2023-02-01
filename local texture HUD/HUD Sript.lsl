@@ -1,3 +1,22 @@
+/*
+    What:
+    A HUD to apply local texture and get the uuid.
+
+    How to build:
+    1: Compile this script in inventory.
+    2: Upload "HUD Mesh.dae" mesh to SL.
+    3: Attach the mesh to your HUD.
+    4: Drag and drop the script in the HUD.
+
+    How to use:
+    1: Attach the HUD.
+    2: Edit and apply a local texture to one side.
+    3: Touch that side to get the texture uuid. 
+
+    ❌ deeded | ✅ optimized | ❌ shared | ❌ self delete
+    ✅ attachment | ❌ rezzed | ❌ link-set | ✅ single object
+*/
+
 default  {
     state_entry() {
         llSetLinkPrimitiveParamsFast(0xFFFFFFFC, [
@@ -43,3 +62,4 @@ default  {
         llRegionSayTo(llDetectedKey(0), 0, msg);
     }
 }
+
