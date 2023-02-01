@@ -1,3 +1,8 @@
+
+// Uncomment the next line when link sound function will be available
+//#define LINK_SOUND_UPDATE
+
+
 #define BUTTON_ALL "ALL"
 #define BUTTON_DONE "DONE"
 
@@ -6,6 +11,7 @@
 #define MENU_SIT "SIT"
 #define MENU_VISUAL "VISUAL"
 #define MENU_SOUND "SOUND"
+#define MENU_LSD "LSD"
 #define MENU_MISC "MISC"
 
 // text
@@ -17,7 +23,7 @@
 
 // flag
 #define BUTTON_VEHICLE "VEHICLE"
-#define BUTTON_VOLUME "VOLUME"
+#define BUTTON_DETECTION "DETECTION"
 #define BUTTON_CHARRACTER "CHARRACTER"
 #define BUTTON_PHYSIC "PHYSIC"
 #define BUTTON_ACTION "ACTION"
@@ -38,7 +44,16 @@
 
 // sound
 #define BUTTON_STOP "STOP"
+#ifdef LINK_SOUND_UPDATE
+    #define BUTTON_VOLUME "VOLUME"
+    #define BUTTON_RADIUS "RADIUS"
+    #define BUTTON_QUEUEING "QUEUEING"
+#endif
 #define BUTTON_COLLISION "COLLISION"
+
+// linkset data
+#define BUTTON_UNPROTECTED "SAFE"
+#define BUTTON_PROTECTED "UNSAFE"
 
 // misc
 #define BUTTON_PIN "PIN"
@@ -51,37 +66,50 @@
 list gl_buttons_main = [
     BUTTON_ALL, MENU_TEXT, MENU_FLAG, 
     MENU_SIT, MENU_VISUAL, MENU_SOUND, 
-    MENU_MISC, BUTTON_DONE
+    MENU_LSD, MENU_MISC, BUTTON_DONE
 ];
 
-list gl_buttons_text = [
-    BUTTON_OVER, BUTTON_TOUCH, BUTTON_SIT,
-    BUTTON_NAME, BUTTON_DESC
-];
+#define gl_buttons_text [ \
+    BUTTON_OVER, BUTTON_TOUCH, BUTTON_SIT, \
+    BUTTON_NAME, BUTTON_DESC \
+]
 
-list gl_buttons_flag = [
-    BUTTON_VEHICLE, BUTTON_VOLUME, BUTTON_CHARRACTER,
-    BUTTON_PHYSIC, BUTTON_ACTION
-];
+#define gl_buttons_flag [ \
+    BUTTON_VEHICLE, BUTTON_DETECTION, BUTTON_CHARRACTER, \
+    BUTTON_PHYSIC, BUTTON_ACTION \
+]
 
-list gl_buttons_sit = [
-    BUTTON_TARGET, BUTTON_CAMERA, BUTTON_MOUSELOOK,
-    BUTTON_SCRIPTED
-];
+#define gl_buttons_sit [ \
+    BUTTON_TARGET, BUTTON_CAMERA, BUTTON_MOUSELOOK, \
+    BUTTON_SCRIPTED \
+]
 
-list gl_buttons_visual = [
-    BUTTON_PARTICLE, BUTTON_KEYFRAMES, BUTTON_OMEGA,
-    BUTTON_ANIMATION, BUTTON_TEXTURE, BUTTON_MOVE
-];
+#define gl_buttons_visual [ \
+    BUTTON_PARTICLE, BUTTON_KEYFRAMES, BUTTON_OMEGA, \
+    BUTTON_ANIMATION, BUTTON_TEXTURE, BUTTON_MOVE \
+]
 
-list gl_buttons_sound = [
-    BUTTON_STOP, BUTTON_COLLISION
-];
+#ifdef LINK_SOUND_UPDATE
+    #define gl_buttons_sound [ \
+        BUTTON_STOP, BUTTON_VOLUME, BUTTON_RADIUS, \
+        BUTTON_QUEUEING, BUTTON_COLLISION \
+    ]
+#else
+    #define gl_buttons_sound [ \
+        BUTTON_STOP, BUTTON_COLLISION \
+    ]
+#endif
 
-list gl_buttons_misc = [
-    BUTTON_PIN, BUTTON_DROP, BUTTON_DAMAGE,
-    BUTTON_RLV
-];
+
+
+#define gl_buttons_lsd [ \
+    BUTTON_UNPROTECTED, BUTTON_PROTECTED \
+]
+
+#define gl_buttons_misc [ \
+    BUTTON_PIN, BUTTON_DROP, BUTTON_DAMAGE, \
+    BUTTON_RLV \
+]
 
 integer gi_channel;
 integer gi_deeded;
@@ -120,6 +148,11 @@ dialog(string user, string message)
         text = "\n\nSound menu.\n\n";
         buttons = gl_buttons_sound;
     }
+    else if (message == MENU_LSD)
+    {
+        text = "\n\nSound menu.\n\n";
+        buttons = gl_buttons_sound;
+    }
     else if (message == MENU_MISC)
     {
         text = "\n\nMisc menu.\n\n";
@@ -128,7 +161,11 @@ dialog(string user, string message)
     else 
         return;
 
-    while(llGetListLength(buttons) % 3) buttons += "-";
+    @dialog_dash_label;
+    if (llGetListLength(buttons) % 3) {
+        buttons += "-";
+        jump dialog_dash_label;
+    }
     buttons = llList2List(buttons, 9, 11) + llList2List(buttons, 6, 8) + 
               llList2List(buttons, 3, 5) + llList2List(buttons, 0, 2);
     llDialog(user, text, buttons, gi_channel);
@@ -173,16 +210,17 @@ default
         else if (id != llGetOwner()) return;
 
         integer do_all;
-        if (message == BUTTON_ALL)
-        {
+        if (message == BUTTON_ALL) {
             do_all = TRUE;
         }
-        else if (message == BUTTON_DONE)
-        {
+        else if (message == BUTTON_DONE) {
             state done;
         }
-        else if (~llListFindList(gl_buttons_main, (list)message))
-        {
+        else if (message == "-") {
+            dialog(id, DIALOG_OPEN);
+            return;
+        }
+        else if (~llListFindList(gl_buttons_main, (list)message)) {
             dialog(id, message);
             return;
         }
@@ -215,7 +253,7 @@ default
 			llSetBuoyancy(0.0);
         }
 
-        if (message == BUTTON_VOLUME || do_all)
+        if (message == BUTTON_DETECTION || do_all)
             llVolumeDetect(FALSE);
 
         if (message == BUTTON_CHARRACTER || do_all)
@@ -263,10 +301,15 @@ default
 
         if (message == BUTTON_ANIMATION || do_all)
         {
-            list animations = llGetObjectAnimationNames();
-            integer len = llGetListLength(animations);
-            while(len)
-                llStopObjectAnimation(llList2String(animations, --len));
+            list ani_list = llGetObjectAnimationNames();
+            if (ani_list) {
+                integer len = llGetListLength(ani_list);
+                @animation_label;
+                {
+                    llStopObjectAnimation(llList2String(ani_list, --len));
+                }
+                if (~len) jump animation_label;
+            }
         }
 
         if (message == BUTTON_TEXTURE || do_all)
@@ -275,23 +318,64 @@ default
         if (message == BUTTON_MOVE || do_all)
         {
             integer it = llTarget(llGetPos(), 1);
-            while (~it) llTargetRemove(--it);
+
+            @target_label; 
+            {
+                llTargetRemove(--it);
+            }
+            if (~it) jump target_label;
             llStopMoveToTarget();
         }
         
         // sound
         if (message == BUTTON_STOP || do_all)
+#ifdef LINK_SOUND_UPDATE
+            llLinkStopSound(LINK_SET);
+#else 
             llStopSound();
+#endif
 
         if (message == BUTTON_COLLISION || do_all)
         {
             integer link = !!llGetLinkNumber();
-            integer links = llList2Integer(llGetObjectDetails(llGetKey(), (list)OBJECT_PRIM_COUNT), 0) + link;
-            for (; link < links; ++link) 
+            integer links = llList2Integer(llGetObjectDetails(llGetKey(), [OBJECT_PRIM_COUNT]), 0);
+
+            @collision_label;
             {
-                integer material = llList2Integer(llGetLinkPrimitiveParams(link, (list)PRIM_MATERIAL), 0);
+                integer material = llList2Integer(llGetLinkPrimitiveParams(link, [PRIM_MATERIAL]), 0);
                 params += [PRIM_LINK_TARGET, link, PRIM_MATERIAL, material];
             }
+            if (++link <= links) jump collision_label;
+        }
+
+#ifdef LINK_SOUND_UPDATE
+        if (message == BUTTON_VOLUME || do_all)
+            llLinkAdjustSoundVolume(LINK_SET, 1);
+
+        if (message == BUTTON_RADIUS || do_all)
+            llLinkSetSoundRadius(LINK_SET, 0);
+        
+        if (message == BUTTON_QUEUEING || do_all)
+            llLinkSetSoundQueueing(LINK_SET, FALSE);
+#endif
+
+        //lsd
+        if (message == BUTTON_UNPROTECTED || do_all) {
+            list keys = llLinksetDataListKeys(0, 0);
+            integer len = llGetListLength(keys);
+            @lsd_key_label;
+            {
+                string curr = llList2String(keys, --len);
+                integer stat = llLinksetDataDelete(curr);
+                if (stat == LINKSETDATA_EPROTECTED) curr += " is protected.";
+                else if (stat == LINKSETDATA_OK) curr += " deleted.";
+                llRegionSayTo(id, PUBLIC_CHANNEL, curr);
+            }
+            if (~len) jump lsd_key_label;
+        }
+
+        if (message == BUTTON_PROTECTED || do_all) {
+            llLinksetDataReset();
         }
 
         // misc
