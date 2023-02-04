@@ -407,7 +407,7 @@ state done
     state_entry()
     {
         llSetTimerEvent(0);
-        llSetClickAction(CLICK_ACTION_NONE);
+        llSetClickAction(CLICK_ACTION_DISABLED);
         llRemoveInventory(llGetScriptName());
     }
 }

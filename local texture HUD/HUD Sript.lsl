@@ -52,12 +52,12 @@ default  {
         integer side = llDetectedTouchFace(0);
         list data = llGetLinkPrimitiveParams(llDetectedLinkNumber(0), [17, side, 37, side, 36, side]);
         string msg;
-        string diffuse = llList2String(data, 0);
-        if (diffuse != "d732ed9d-4215-bfb4-6dab-e4a729e4d27f") msg += "\nDiffuse: " + diffuse;
-        string normal = llList2String(data, 4);
-        if (normal != "04870cc4-f5bd-0ead-2419-9272b372f1df") msg += "\nNormal: " + normal;
-        string specular = llList2String(data, 8);
-        if (specular != "acb83321-5e2a-cbb7-8b20-5aa6c58f3b5d") msg += "\nSpecular: " + specular;
+        key diffuse = llList2Key(data, 0);
+        if (diffuse) if (diffuse != "d732ed9d-4215-bfb4-6dab-e4a729e4d27f") msg += "\nDiffuse: " + (string)diffuse;
+        key normal = llList2Key(data, 4);
+        if (normal) if (normal != "04870cc4-f5bd-0ead-2419-9272b372f1df") msg += "\nNormal: " + (string)normal;
+        key specular = llList2Key(data, 8);
+        if (specular) if (specular != "acb83321-5e2a-cbb7-8b20-5aa6c58f3b5d") msg += "\nSpecular: " + (string)specular;
         if (msg == "") msg = "Apply a local texture first.";
         llRegionSayTo(llDetectedKey(0), 0, msg);
     }

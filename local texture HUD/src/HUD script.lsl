@@ -53,17 +53,14 @@ default {
 
         string msg;
         
-        string diffuse = llList2String(data, DIFFUSE_OFFSET);
-        if (diffuse != DIFFUSE_MAP)
-            msg += "\nDiffuse: " + diffuse;
+        key diffuse = llList2Key(data, DIFFUSE_OFFSET);
+        if (diffuse) if (diffuse != DIFFUSE_MAP)  msg += "\nDiffuse: " + (string)diffuse;
 
-        string normal = llList2String(data, NORMAL_OFFSET);
-        if (normal != NORMAL_MAP)
-            msg += "\nNormal: " + normal;
+        key normal = llList2Key(data, NORMAL_OFFSET);
+        if (normal) if (normal != NORMAL_MAP) msg += "\nNormal: " + (string)normal;
 
-        string specular = llList2String(data, SPECULAR_OFFSET);
-        if (specular != SPECULAR_MAP)
-            msg += "\nSpecular: " + specular;
+        key specular = llList2Key(data, SPECULAR_OFFSET);
+        if (specular) if (specular != SPECULAR_MAP) msg += "\nSpecular: " + (string)specular;
 
         if (msg == "") msg = "Apply a local texture first.";
 
