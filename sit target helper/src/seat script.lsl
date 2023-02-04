@@ -9,7 +9,7 @@ string short_float(float value, integer dec) {
     float div = llPow(10, dec);
     string snumb = (string)(llRound(value * div) / div);
     snumb = llGetSubString(snumb, 0, llSubStringIndex(snumb, ".") + dec);
-    if (snumb == (string)((integer)snumb)) return (string)((integer)snumb);
+    //if (snumb == (string)((integer)snumb)) return (string)((integer)snumb);
     @trim_label;
     if (llGetSubString(snumb, -1, -1) == "0") {
         snumb = llDeleteSubString(snumb, -1, -1);
@@ -108,7 +108,8 @@ default {
 
     changed( integer change ) {
         if (change & CHANGED_LINK) {
-            integer sitter_numb = llList2Integer(llGetObjectDetails(llGetKey(), [OBJECT_SIT_COUNT]), 0);
+            list seat_data = llGetObjectDetails(llGetKey(), [OBJECT_SIT_COUNT, OBJECT_ROOT]);
+            integer sitter_numb = llList2Integer(seat_data, 0);
             integer mem_len = llGetListLength(gl_mem);
 
             if (sitter_numb > mem_len) {
@@ -138,22 +139,22 @@ default {
                 
             }
             else if (sitter_numb < mem_len) {
-                string obj_root = llGetLinkKey(!!llGetLinkNumber());
+                string obj_root = llList2String(seat_data, 1);
 
                 @search_label_002;
                 if (mem_len > 0) {
                     string obj = llList2String(gl_mem, --mem_len);
-                    string user = llJsonGetValue(obj, [JSON_USER]);
+                    string user_id = llJsonGetValue(obj, [JSON_USER]);
                     
                     integer remove;
-                    if (llGetObjectMass(user) == 0) remove = TRUE;
+                    if (llGetObjectMass(user_id) == 0) remove = TRUE;
                     else {
-                        string user_root = llList2String(llGetObjectDetails(user, [OBJECT_ROOT]), 0);
-                        if (user == user_root || user_root != obj_root) remove = TRUE;
+                        string user_root = llList2String(llGetObjectDetails(user_id, [OBJECT_ROOT]), 0);
+                        if (user_id == user_root || user_root != obj_root) remove = TRUE;
                     } 
 
                     if (remove) {
-                        llRegionSayTo(llJsonGetValue(obj, [JSON_WIDGET]), gi_channel, llJsonSetValue("", [CHAT_CMD_ACTION], CHAT_CMD_DIE));
+                        llRegionSayTo(llJsonGetValue(obj, [JSON_WIDGET]), gi_channel, "{\"" + CHAT_CMD_ACTION + "\":\"" + CHAT_CMD_DIE + "\"}");
                         gl_mem = llDeleteSubList(gl_mem, mem_len, mem_len);
                     }
                     jump search_label_002;

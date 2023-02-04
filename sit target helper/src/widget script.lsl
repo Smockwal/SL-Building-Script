@@ -8,20 +8,19 @@ integer gi_flag;
 
 //#define JSON_COLOR "col"
 
-string gs_target;
 string gs_base_id;
 integer gi_channel;
 
 integer gi_pos_target_id;
 integer gi_rot_target_id;
 
-vector gv_pos;
-rotation gr_rot;
-
 integer gi_numb;
 integer gi_link;
+integer gi_mod;
 
 float gf_touch_time;
+
+list gl_prim_data;
 
 set_target(integer on) {
     gi_flag = (gi_flag & ~TARGET_SET) | (-bool(on) & TARGET_SET);
@@ -30,8 +29,8 @@ set_target(integer on) {
     llRotTargetRemove(gi_rot_target_id);
 
     if (on) {
-        gi_pos_target_id = llTarget(llGetPos(), VALUE_THRESHOLD);
-        gi_rot_target_id = llRotTarget(llGetRot(), VALUE_THRESHOLD);
+        gi_pos_target_id = llTarget(llList2Vector(gl_prim_data, 0), VALUE_THRESHOLD);
+        gi_rot_target_id = llRotTarget(llList2Rot(gl_prim_data, 1), VALUE_THRESHOLD);
     }
     else 
         gi_pos_target_id = gi_rot_target_id = 0;
@@ -54,7 +53,7 @@ default {
             gs_base_id = llList2String(llGetObjectDetails(llGetKey(), [OBJECT_REZZER_KEY]), 0);
 
             gi_numb = llList2Integer(llGetObjectDetails(gs_base_id, [OBJECT_PRIM_COUNT]), 0);
-            gi_link = (gi_numb > 1);
+            gi_link = gi_mod = (gi_numb > 1);
 
             llSetLinkPrimitiveParamsFast(LINK_THIS, [
                 PRIM_COLOR, ALL_SIDES, (<((start_param >> 16) & 0xFF), ((start_param >> 8) & 0xFF), (start_param & 0xFF)> / 255.0), 1,
@@ -62,13 +61,11 @@ default {
             ]);
 
             gi_channel = 0xFFFF + ((start_param >> 24) & 0xFF);
-            //llOwnerSay("channel: " + (string)gi_channel);
             llListen(gi_channel, llKey2Name(gs_base_id), gs_base_id, "");
 
-            llRegionSayTo(gs_base_id, gi_channel, llJsonSetValue("", [CHAT_CMD_ACTION], CHAT_CMD_LOGGIN));
+            llRegionSayTo(gs_base_id, gi_channel, "{\"" + CHAT_CMD_ACTION + "\":\"" + CHAT_CMD_LOGGIN + "\"}");
 
-            gv_pos = llGetPos();
-            gr_rot = llGetRot();
+            gl_prim_data = llGetLinkPrimitiveParams(LINK_THIS, [PRIM_POSITION, PRIM_ROTATION]);
             set_target(TRUE);
         }
     }
@@ -88,19 +85,15 @@ default {
     }
 
     link_message( integer sender_num, integer num, string str, key id ) {
-        
-        if (num)
-            return;
+        if (num) return;
 
-        vector pos = llGetPos();
-        rotation rot = llGetRot();
-        if (pos != gv_pos || rot != gr_rot) {
-            llRegionSayTo(gs_base_id, gi_channel, llJsonSetValue("", [CHAT_CMD_ACTION], CHAT_CMD_UPDATE));
-            gv_pos = pos;
-            gr_rot = rot;
+        list prim_data = llGetLinkPrimitiveParams(LINK_THIS, [PRIM_POSITION, PRIM_ROTATION]);
+        if (llDumpList2String(prim_data, "") != llDumpList2String(gl_prim_data, "")) {
+            llRegionSayTo(gs_base_id, gi_channel, "{\"" + CHAT_CMD_ACTION + "\":\"" + CHAT_CMD_UPDATE + "\"}");
+            gl_prim_data = prim_data;
             llMessageLinked(LINK_THIS, gi_flag & TARGET_SET, "", "");
         }
-        else
+        else 
             set_target(TRUE);
     }
 
@@ -110,25 +103,18 @@ default {
 
     touch_end( integer num_detected ) {
         if ((llGetAndResetTime() - gf_touch_time) < 1) {
-            if ((gi_numb + (gi_numb > 1)) <= ++gi_link)
-                gi_link = (gi_numb > 1);
-
+            if ((gi_numb + gi_mod) <= ++gi_link) gi_link = gi_mod;
             llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_TEXT, (string)gi_link, <0,1,0>, 1]);
         }
-        else {
-            string msg = "{\"" + CHAT_CMD_ACTION + "\":\"" + CHAT_CMD_TELL + "\",\"" + CHAT_CMD_LINK + "\":\"" + (string)gi_link + "\"}";
-            llRegionSayTo(gs_base_id, gi_channel, msg);
-        }
+        else llRegionSayTo(gs_base_id, gi_channel, "{\"" + CHAT_CMD_ACTION + "\":\"" + CHAT_CMD_TELL + "\",\"" + CHAT_CMD_LINK + "\":\"" + (string)gi_link + "\"}");
     }
 
     listen( integer channel, string name, key id, string message ) {
         if (id != gs_base_id) return;
         string act = llJsonGetValue(message, [CHAT_CMD_ACTION]);
 
-        if (act == CHAT_CMD_DIE) {
-            llDie();
-        } else if (act == CHAT_CMD_COLOR) {
+        if (act == CHAT_CMD_DIE) llDie();
+        else if (act == CHAT_CMD_COLOR) 
             llSetColor((vector)llJsonGetValue(message, [CHAT_CMD_COLOR]), ALL_SIDES);
-        }
     }
 }

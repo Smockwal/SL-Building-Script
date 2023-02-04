@@ -1,20 +1,20 @@
 string g_;
+integer Library;
+integer Pop;
 integer UThread;
 integer System;
-integer Pop;
-vector LslLibrary;
-quaternion ResumeVoid;
-integer IsSaveDue;
-float Library;
+list LslLibrary;
+integer ResumeVoid;
+float IsSaveDue;
 integer IsRestoring;
 integer edefaultrez;
 _(integer llDie) {
-    IsSaveDue = (IsSaveDue & 0xFFFFFFFE) | ( - !!llDie & 1);
+    ResumeVoid = (ResumeVoid & 0xFFFFFFFE) | ( - !!llDie & 1);
     llTargetRemove(IsRestoring);
     llRotTargetRemove(edefaultrez);
     if (llDie) {
-        IsRestoring = llTarget(llGetPos(), 0.001);
-        edefaultrez = llRotTarget(llGetRot(), 0.001);
+        IsRestoring = llTarget(llList2Vector(LslLibrary, 0), 0.001);
+        edefaultrez = llRotTarget(llList2Rot(LslLibrary, 1), 0.001);
     }
     else IsRestoring = edefaultrez = 0;
 }
@@ -25,62 +25,52 @@ default  {
     on_rez(integer llDie) {
         if (llDie) {
             g_ = llList2String(llGetObjectDetails(llGetKey(), (list)32), 0);
-            UThread = llList2Integer(llGetObjectDetails(g_, (list)30), 0);
-            System = (UThread > 1);
-            llSetLinkPrimitiveParamsFast(0xFFFFFFFC, [18, 0xFFFFFFFF, (<((llDie >> 16) & 255), ((llDie >> 8) & 255), (llDie & 255)> * 0.00392156862745098), 1, 26, (string)System, <0, 1, 0>, 1]);
-            Pop = 65535 + ((llDie >> 24) & 255);
-            llListen(Pop, llKey2Name(g_), g_, "");
-            llRegionSayTo(g_, Pop, llJsonSetValue("", (list)"f", "k"));
-            LslLibrary = llGetPos();
-            ResumeVoid = llGetRot();
+            Library = llList2Integer(llGetObjectDetails(g_, (list)30), 0);
+            Pop = UThread = (Library > 1);
+            llSetLinkPrimitiveParamsFast(0xFFFFFFFC, [18, 0xFFFFFFFF, (<((llDie >> 16) & 255), ((llDie >> 8) & 255), (llDie & 255)> * 0.00392156862745098), 1, 26, (string)Pop, <0, 1, 0>, 1]);
+            System = 65535 + ((llDie >> 24) & 255);
+            llListen(System, llKey2Name(g_), g_, "");
+            llRegionSayTo(g_, System, "{\"f\":\"k\"}");
+            LslLibrary = llGetLinkPrimitiveParams(0xFFFFFFFC, [6, 8]);
             _(1);
         }
     }
     not_at_target() {
-        if (IsSaveDue & 1) {
+        if (ResumeVoid & 1) {
             _(0);
-            llMessageLinked(0xFFFFFFFC, IsSaveDue & 1, "", "");
+            llMessageLinked(0xFFFFFFFC, ResumeVoid & 1, "", "");
         }
     }
     not_at_rot_target() {
-        if (IsSaveDue & 1) {
+        if (ResumeVoid & 1) {
             _(0);
-            llMessageLinked(0xFFFFFFFC, IsSaveDue & 1, "", "");
+            llMessageLinked(0xFFFFFFFC, ResumeVoid & 1, "", "");
         }
     }
-    link_message(integer llDie, integer llGetRot, string llGetPos, key llListen) {
-        if (llGetRot)return ;
-        vector pos = llGetPos();
-        quaternion rot = llGetRot();
-        if (pos != LslLibrary | rot != ResumeVoid) {
-            llRegionSayTo(g_, Pop, llJsonSetValue("", (list)"f", "j"));
-            LslLibrary = pos;
-            ResumeVoid = rot;
-            llMessageLinked(0xFFFFFFFC, IsSaveDue & 1, "", "");
+    link_message(integer llDie, integer llListen, string llGetKey, key llTarget) {
+        if (llListen)return ;
+        list prim_data = llGetLinkPrimitiveParams(0xFFFFFFFC, [6, 8]);
+        if (llDumpList2String(prim_data, "") != llDumpList2String(LslLibrary, "")) {
+            llRegionSayTo(g_, System, "{\"f\":\"j\"}");
+            LslLibrary = prim_data;
+            llMessageLinked(0xFFFFFFFC, ResumeVoid & 1, "", "");
         }
         else _(1);
     }
     touch_start(integer llDie) {
-        Library = llGetTime();
+        IsSaveDue = llGetTime();
     }
     touch_end(integer llDie) {
-        if ((llGetAndResetTime() - Library) < 1) {
-            if ((UThread + (UThread > 1)) <= ++System) System = (UThread > 1);
-            llSetLinkPrimitiveParamsFast(0xFFFFFFFC, [26, (string)System, <0, 1, 0>, 1]);
+        if ((llGetAndResetTime() - IsSaveDue) < 1) {
+            if ((Library + UThread) <= ++Pop) Pop = UThread;
+            llSetLinkPrimitiveParamsFast(0xFFFFFFFC, [26, (string)Pop, <0, 1, 0>, 1]);
         }
-        else  {
-            string msg = "{\"f\":\"i\",\"l\":\"" + (string)System + "\"}";
-            llRegionSayTo(g_, Pop, msg);
-        }
+        else llRegionSayTo(g_, System, "{\"f\":\"i\",\"l\":\"" + (string)Pop + "\"}");
     }
-    listen(integer llDie, string llGetRot, key llGetPos, string llListen) {
-        if (llGetPos != g_)return ;
-        string act = llJsonGetValue(llListen, (list)"f");
-        if (act == "h") {
-            llDie();
-        }
-        else if (act == "g") {
-            llSetColor((vector)llJsonGetValue(llListen, (list)"g"), 0xFFFFFFFF);
-        }
+    listen(integer llDie, string llListen, key llGetKey, string llTarget) {
+        if (llGetKey != g_)return ;
+        string act = llJsonGetValue(llTarget, (list)"f");
+        if (act == "h") llDie();
+        else if (act == "g") llSetColor((vector)llJsonGetValue(llTarget, (list)"g"), 0xFFFFFFFF);
     }
 }

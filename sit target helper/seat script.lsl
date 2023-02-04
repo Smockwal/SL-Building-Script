@@ -76,7 +76,6 @@ string f(float ga, integer gb) {
     float div = llPow(10, gb);
     string snumb = (string)(llRound(ga * div) / div);
     snumb = llGetSubString(snumb, 0, llSubStringIndex(snumb, ".") + gb);
-    if (snumb == (string)((integer)snumb))return (string)((integer)snumb);
      @ trim_label;
     if (llGetSubString(snumb, 0xFFFFFFFF, 0xFFFFFFFF) == "0") {
         snumb = llDeleteSubString(snumb, 0xFFFFFFFF, 0xFFFFFFFF);
@@ -96,7 +95,8 @@ default  {
     }
     changed(integer ga) {
         if (ga & 32) {
-            integer sitter_numb = llList2Integer(llGetObjectDetails(llGetKey(), (list)38), 0);
+            list seat_data = llGetObjectDetails(llGetKey(), [38, 18]);
+            integer sitter_numb = llList2Integer(seat_data, 0);
             integer mem_len = llGetListLength(gf);
             if (sitter_numb > mem_len) {
                 integer user_link = llGetNumberOfPrims();
@@ -112,16 +112,16 @@ default  {
                 }
             }
             else if (sitter_numb < mem_len) {
-                string obj_root = llGetLinkKey(!!llGetLinkNumber());
+                string obj_root = llList2String(seat_data, 1);
                  @ search_label_002;
                 if (mem_len > 0) {
                     string obj = llList2String(gf, --mem_len);
-                    string user = llJsonGetValue(obj, (list)"b");
+                    string user_id = llJsonGetValue(obj, (list)"b");
                     integer remove;
-                    if (llGetObjectMass(user) == 0) remove = 1;
+                    if (llGetObjectMass(user_id) == 0) remove = 1;
                     else  {
-                        string user_root = llList2String(llGetObjectDetails(user, (list)18), 0);
-                        if (user == user_root | user_root != obj_root) remove = 1;
+                        string user_root = llList2String(llGetObjectDetails(user_id, (list)18), 0);
+                        if (user_id == user_root | user_root != obj_root) remove = 1;
                     }
                     if (remove) {
                         llRegionSayTo(llJsonGetValue(obj, (list)"d"), ge, llJsonSetValue("", (list)"f", "h"));
