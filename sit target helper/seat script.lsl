@@ -124,7 +124,7 @@ default  {
                         if (user_id == user_root | user_root != obj_root) remove = 1;
                     }
                     if (remove) {
-                        llRegionSayTo(llJsonGetValue(obj, (list)"d"), ge, llJsonSetValue("", (list)"f", "h"));
+                        llRegionSayTo(llJsonGetValue(obj, (list)"d"), ge, "{\"f\":\"h\"}");
                         gf = llDeleteSubList(gf, mem_len, mem_len);
                     }
                     jump search_label_002;
