@@ -1,3 +1,28 @@
+/*
+    What:
+    A script to set and print sit target.
+
+    How to build:
+    1: Compile the 2 scripts in inventory.
+    2: Create a new prim object.
+    3: Drop the "widget script.lsl" in that new prim.
+    4: Take the prim.
+
+    How to use:
+    1: Drop the "seat script.lsl" script and the "_sitter_helper_widget_" object in an object.
+    2: Sit on that object.
+    3: Edit the widget to move your avatar.
+    4: Click the widget to scroll between link. (Link number are indicated over the widget)
+    5: Click-Hold the widget to print and set the sit target for the selected link.
+
+    Note:
+    - Start an animation after sitting to get the data for this animation
+    - Use alt(s) for multiple actor scene.
+
+    ✅ deeded | ✅ optimized | ✅ shared | ✅ self delete
+    ❌ attachment | ✅ rezzed | ✅ link-set | ✅ single object
+*/
+
 integer ge;
 list gf;
 vector a() {
