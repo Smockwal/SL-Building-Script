@@ -88,7 +88,7 @@ default {
         if (num) return;
 
         list prim_data = llGetLinkPrimitiveParams(LINK_THIS, [PRIM_POSITION, PRIM_ROTATION]);
-        if (llDumpList2String(prim_data, "") != llDumpList2String(gl_prim_data, "")) {
+        if (llListFindList(gl_prim_data, prim_data) & 0x80000000) {
             llRegionSayTo(gs_base_id, gi_channel, "{\"" + CHAT_CMD_ACTION + "\":\"" + CHAT_CMD_UPDATE + "\"}");
             gl_prim_data = prim_data;
             llMessageLinked(LINK_THIS, gi_flag & TARGET_SET, "", "");

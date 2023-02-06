@@ -50,7 +50,7 @@ default  {
     link_message(integer llDie, integer llListen, string llGetKey, key llTarget) {
         if (llListen)return ;
         list prim_data = llGetLinkPrimitiveParams(0xFFFFFFFC, [6, 8]);
-        if (llDumpList2String(prim_data, "") != llDumpList2String(LslLibrary, "")) {
+        if (llListFindList(LslLibrary, prim_data) & 0x80000000) {
             llRegionSayTo(g_, System, "{\"f\":\"j\"}");
             LslLibrary = prim_data;
             llMessageLinked(0xFFFFFFFC, ResumeVoid & 1, "", "");
